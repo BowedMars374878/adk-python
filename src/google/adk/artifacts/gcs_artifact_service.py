@@ -268,6 +268,15 @@ class GcsArtifactService(BaseArtifactService):
     artifact = types.Part.from_bytes(
         data=artifact_bytes, mime_type=blob.content_type
     )
+    if artifact.inline_data.mime_type == "text/plain": # checks if the artifact is meant to be text
+      # from_bytes parses *any* data on the saved artifact as inline_data, even if it was originally text
+      # in order for the data to be saved as text, the original artifact must not have had inline data
+      # therefore we can safely parse the inline data as text, since we know that's what it originally represented
+      artifact.text = artifact.inline_data.data
+      # _save_artifact only parses text if inline_data is None
+      # therefore, having the text in both fields could be problematic
+      # we need to clear the inline data so that this artifact can safely be saved and loaded again
+      artifact.inline_data = None
     return artifact
 
   def _list_artifact_keys(

@@ -20,6 +20,21 @@ from google.adk.examples import base_example_provider
 from google.genai import types
 import pytest
 
+BASIC_INPUT = types.Content(
+    role="user",
+    parts=[types.Part(text="test_input")]
+)
+
+BASIC_OUTPUT = [types.Content(
+    role="model",
+    parts=[types.Part(text="test_output")]
+)]
+
+BASIC_EXAMPLE = example.Example(
+    input=BASIC_INPUT,
+    output=BASIC_OUTPUT
+)
+
 
 class MockExampleProvider(base_example_provider.BaseExampleProvider):
     """Mocks an ExampleProvider object.
@@ -31,7 +46,7 @@ class MockExampleProvider(base_example_provider.BaseExampleProvider):
     """
     
     def __init__(self, test_examples: list[example.Example], test_query: str) -> None:
-        """Initializes a MockBlob.
+        """Initializes a MockExampleProvider.
 
         Args:
             test_examples: The list of examples to be returned on a successful query.
@@ -63,19 +78,6 @@ class MockExampleProvider(base_example_provider.BaseExampleProvider):
 )
 def test_text_only_example_conversion(model):
     """Tests converting a text-only Example object to a string for use in a system instruction."""
-    input_content = types.Content(
-        role="user",
-        parts=[types.Part(text="test_input")]
-    )
-    output_content = [types.Content(
-        role="model",
-        parts=[types.Part(text="test_output")]
-    )]
-    test_example = example.Example(
-        input=input_content,
-        output=output_content
-    )
-
     expected_output = (
         f"{example_util._EXAMPLES_INTRO}"
         f"{example_util._EXAMPLE_START.format(1)}"
@@ -85,7 +87,7 @@ def test_text_only_example_conversion(model):
         f"{example_util._EXAMPLES_END}"
     )
 
-    assert example_util.convert_examples_to_text(examples=[test_example], model=model) == expected_output
+    assert example_util.convert_examples_to_text(examples=[BASIC_EXAMPLE], model=model) == expected_output
 
 
 @pytest.mark.parametrize(
@@ -98,10 +100,6 @@ def test_text_only_example_conversion(model):
 )
 def test_multi_part_text_example_conversion(model):
     """Tests converting an Example object with multiple text Parts to a string for use in a system instruction."""
-    input_content = types.Content(
-        role="user",
-        parts=[types.Part(text="test_input")]
-    )
     output_content = [types.Content(
         role="model",
         parts=[
@@ -111,7 +109,7 @@ def test_multi_part_text_example_conversion(model):
         ]
     )]
     test_example = example.Example(
-        input=input_content,
+        input=BASIC_INPUT,
         output=output_content
     )
 
@@ -137,10 +135,6 @@ def test_multi_part_text_example_conversion(model):
 )
 def test_example_conversion_prefix_insertion(model):
     """Tests if user and model prefixes are properly alternated when converting an Example object to text for use in a system instruction."""
-    input_content = types.Content(
-        role="user",
-        parts=[types.Part(text="test_input")]
-    )
     output_content = [
         types.Content(
             role="model",
@@ -156,7 +150,7 @@ def test_example_conversion_prefix_insertion(model):
         )
     ]
     test_example = example.Example(
-        input=input_content,
+        input=BASIC_INPUT,
         output=output_content
     )
 
@@ -184,10 +178,6 @@ def test_example_conversion_prefix_insertion(model):
 )
 def test_example_conversion_output_clumping(model):
     """Tests whether user and model inputs are properly clumped when converting an Example object to text for use in a system instruction."""
-    input_content = types.Content(
-        role="user",
-        parts=[types.Part(text="test_input")]
-    )
     output_content = [
         types.Content(
             role="model",
@@ -207,7 +197,7 @@ def test_example_conversion_output_clumping(model):
         )
     ]
     test_example = example.Example(
-        input=input_content,
+        input=BASIC_INPUT,
         output=output_content
     )
 
@@ -256,16 +246,12 @@ def test_example_conversion_with_function_call(model):
             "test_int_argument": 1
         }
     )
-    input_content = types.Content(
-        role="user",
-        parts=[types.Part(text="test_input")]
-    )
     output_content = [types.Content(
         role="model",
         parts=[types.Part(function_call=test_function_call)]
     )]
     test_example = example.Example(
-        input=input_content,
+        input=BASIC_INPUT,
         output=output_content
     )
 
@@ -303,16 +289,12 @@ def test_example_conversion_with_function_response(model):
             "test_int_argument": 1
         }
     )
-    input_content = types.Content(
-        role="user",
-        parts=[types.Part(text="test_input")]
-    )
     output_content = [types.Content(
         role="model",
         parts=[types.Part(function_response=test_function_response)]
     )]
     test_example = example.Example(
-        input=input_content,
+        input=BASIC_INPUT,
         output=output_content
     )
 
@@ -357,10 +339,6 @@ def test_example_conversion_with_function_call_response(model):
             "test_int_argument": 1
         }
     )
-    input_content = types.Content(
-        role="user",
-        parts=[types.Part(text="test_input")]
-    )
     output_content = [types.Content(
         role="model",
         parts=[
@@ -369,7 +347,7 @@ def test_example_conversion_with_function_call_response(model):
         ]
     )]
     test_example = example.Example(
-        input=input_content,
+        input=BASIC_INPUT,
         output=output_content
     )
 
@@ -418,10 +396,6 @@ def test_example_conversion_with_text_and_function_call_response(model):
             "test_int_argument": 1
         }
     )
-    input_content = types.Content(
-        role="user",
-        parts=[types.Part(text="test_input")]
-    )
     output_content = [types.Content(
         role="model",
         parts=[
@@ -431,7 +405,7 @@ def test_example_conversion_with_text_and_function_call_response(model):
         ]
     )]
     test_example = example.Example(
-        input=input_content,
+        input=BASIC_INPUT,
         output=output_content
     )
 
@@ -467,19 +441,6 @@ def test_example_conversion_with_text_and_function_call_response(model):
 )
 def test_building_si_from_list(model):
     """Tests building System Information from a list of examples."""
-    input_content = types.Content(
-        role="user",
-        parts=[types.Part(text="test_input")]
-    )
-    output_content = [types.Content(
-        role="model",
-        parts=[types.Part(text="test_output")]
-    )]
-    test_example = example.Example(
-        input=input_content,
-        output=output_content
-    )
-
     expected_output = (
         f"{example_util._EXAMPLES_INTRO}"
         f"{example_util._EXAMPLE_START.format(1)}"
@@ -489,7 +450,7 @@ def test_building_si_from_list(model):
         f"{example_util._EXAMPLES_END}"
     )
 
-    assert example_util.build_example_si(examples=[test_example], query="", model=model) == expected_output
+    assert example_util.build_example_si(examples=[BASIC_EXAMPLE], query="", model=model) == expected_output
 
 
     
@@ -503,19 +464,6 @@ def test_building_si_from_list(model):
 )
 def test_building_si_from_base_example_provider(model):
     """Tests building System Information from an example provider."""
-    input_content = types.Content(
-        role="user",
-        parts=[types.Part(text="test_input")]
-    )
-    output_content = [types.Content(
-        role="model",
-        parts=[types.Part(text="test_output")]
-    )]
-    test_example = example.Example(
-        input=input_content,
-        output=output_content
-    )
-
     expected_output = (
         f"{example_util._EXAMPLES_INTRO}"
         f"{example_util._EXAMPLE_START.format(1)}"
@@ -525,6 +473,6 @@ def test_building_si_from_base_example_provider(model):
         f"{example_util._EXAMPLES_END}"
     )
 
-    example_provider = MockExampleProvider(test_examples=[test_example], test_query="test_query")
+    example_provider = MockExampleProvider(test_examples=[BASIC_EXAMPLE], test_query="test_query")
 
     assert example_util.build_example_si(examples=example_provider, query="test_query", model=model) == expected_output

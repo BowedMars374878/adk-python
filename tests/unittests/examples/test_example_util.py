@@ -53,7 +53,15 @@ class MockExampleProvider(base_example_provider.BaseExampleProvider):
             return []
 
 
-def test_text_only_example_conversion():
+@pytest.mark.parametrize(
+    "model",
+    [
+        "gemini-2.5-flash",
+        "llama3_vertex_agent",
+        None
+    ],
+)
+def test_text_only_example_conversion(model):
     """Tests converting a text-only Example object to a string for use in a system instruction."""
     input_content = types.Content(
         role="user",
@@ -77,10 +85,18 @@ def test_text_only_example_conversion():
         f"{example_util._EXAMPLES_END}"
     )
 
-    assert example_util.convert_examples_to_text(examples=[test_example], model=None) == expected_output
+    assert example_util.convert_examples_to_text(examples=[test_example], model=model) == expected_output
 
 
-def test_multi_part_text_example_conversion():
+@pytest.mark.parametrize(
+    "model",
+    [
+        "gemini-2.5-flash",
+        "llama3_vertex_agent",
+        None
+    ],
+)
+def test_multi_part_text_example_conversion(model):
     """Tests converting an Example object with multiple text Parts to a string for use in a system instruction."""
     input_content = types.Content(
         role="user",
@@ -108,10 +124,18 @@ def test_multi_part_text_example_conversion():
         f"{example_util._EXAMPLES_END}"
     )
 
-    assert example_util.convert_examples_to_text(examples=[test_example], model=None) == expected_output
+    assert example_util.convert_examples_to_text(examples=[test_example], model=model) == expected_output
 
 
-def test_example_conversion_prefix_insertion():
+@pytest.mark.parametrize(
+    "model",
+    [
+        "gemini-2.5-flash",
+        "llama3_vertex_agent",
+        None
+    ],
+)
+def test_example_conversion_prefix_insertion(model):
     """Tests if user and model prefixes are properly alternated when converting an Example object to text for use in a system instruction."""
     input_content = types.Content(
         role="user",
@@ -147,10 +171,18 @@ def test_example_conversion_prefix_insertion():
         f"{example_util._EXAMPLES_END}"
     )
 
-    assert example_util.convert_examples_to_text(examples=[test_example], model=None) == expected_output
+    assert example_util.convert_examples_to_text(examples=[test_example], model=model) == expected_output
 
 
-def test_example_conversion_output_clumping():
+@pytest.mark.parametrize(
+    "model",
+    [
+        "gemini-2.5-flash",
+        "llama3_vertex_agent",
+        None
+    ],
+)
+def test_example_conversion_output_clumping(model):
     """Tests whether user and model inputs are properly clumped when converting an Example object to text for use in a system instruction."""
     input_content = types.Content(
         role="user",
@@ -189,14 +221,22 @@ def test_example_conversion_output_clumping():
         f"{example_util._EXAMPLES_END}"
     )
 
-    assert example_util.convert_examples_to_text(examples=[test_example], model=None) == expected_output
+    assert example_util.convert_examples_to_text(examples=[test_example], model=model) == expected_output
 
 
-def test_empty_examples_list_conversion():
+@pytest.mark.parametrize(
+    "model",
+    [
+        "gemini-2.5-flash",
+        "llama3_vertex_agent",
+        None
+    ],
+)
+def test_empty_examples_list_conversion(model):
     """Tests Example conversion to text if the examples list is empty."""
     expected_output = f"{example_util._EXAMPLES_INTRO}{example_util._EXAMPLES_END}"
 
-    assert example_util.convert_examples_to_text(examples=[], model=None) == expected_output
+    assert example_util.convert_examples_to_text(examples=[], model=model) == expected_output
 
 
 @pytest.mark.parametrize(

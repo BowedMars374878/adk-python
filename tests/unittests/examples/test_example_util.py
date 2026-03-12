@@ -502,7 +502,7 @@ def test_building_si_from_list(model):
     ],
 )
 def test_building_si_from_base_example_provider(model):
-    """Tests building System Information from a BaseExampleProvider object."""
+    """Tests building System Information from an example provider."""
     input_content = types.Content(
         role="user",
         parts=[types.Part(text="test_input")]

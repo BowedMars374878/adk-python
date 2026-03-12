@@ -269,7 +269,7 @@ def test_example_conversion_with_function_call(model):
         output=output_content
     )
 
-    gemini2 = model == "gemini-2.5-flash" or model == None
+    gemini2 = model is None or "gemini-2" in model
     prefix = example_util._FUNCTION_PREFIX if gemini2 else example_util._FUNCTION_CALL_PREFIX
     
     expected_output = (
@@ -316,7 +316,7 @@ def test_example_conversion_with_function_response(model):
         output=output_content
     )
 
-    gemini2 = model == "gemini-2.5-flash" or model == None
+    gemini2 = model is None or "gemini-2" in model
     prefix = example_util._FUNCTION_PREFIX if gemini2 else example_util._FUNCTION_RESPONSE_PREFIX
     
     expected_output = (
@@ -373,7 +373,7 @@ def test_example_conversion_with_function_call_response(model):
         output=output_content
     )
 
-    gemini2 = model == "gemini-2.5-flash" or model == None
+    gemini2 = model is None or "gemini-2" in model
     response_prefix = example_util._FUNCTION_PREFIX if gemini2 else example_util._FUNCTION_RESPONSE_PREFIX
     call_prefix = example_util._FUNCTION_PREFIX if gemini2 else example_util._FUNCTION_CALL_PREFIX
     
@@ -435,7 +435,7 @@ def test_example_conversion_with_text_and_function_call_response(model):
         output=output_content
     )
 
-    gemini2 = model is None or model == "gemini-2.5-flash"
+    gemini2 = model is None or "gemini-2" in model
     response_prefix = example_util._FUNCTION_PREFIX if gemini2 else example_util._FUNCTION_RESPONSE_PREFIX
     call_prefix = example_util._FUNCTION_PREFIX if gemini2 else example_util._FUNCTION_CALL_PREFIX
     

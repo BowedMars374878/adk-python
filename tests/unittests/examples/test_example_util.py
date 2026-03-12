@@ -16,8 +16,41 @@
 
 from google.adk.examples import example_util
 from google.adk.examples import example
+from google.adk.examples import base_example_provider
 from google.genai import types
 import pytest
+
+
+class MockExampleProvider(base_example_provider.BaseExampleProvider):
+    """Mocks an ExampleProvider object.
+
+    This class provides mock implementation of the get_examples() function,
+    allowing the user to test functions that rely on an ExampleProvider
+    without creating a real ExampleProvider class and check that the correct
+    inputs are being passed to it.
+    """
+    
+    def __init__(self, test_examples: list[example.Example], test_query: str) -> None:
+        """Initializes a MockBlob.
+
+        Args:
+            test_examples: The list of examples to be returned on a successful query.
+            test_query: The query necessary to return a correct output.
+        """
+        self.test_examples = test_examples
+        self.test_query = test_query
+
+    def get_examples(self, query: str) -> list[example.Example]:
+        """Mocks querying the ExampleProvider for examples.
+        Verifies the query is correct, and returns an empty list if not.
+
+        Args:
+            query: The query to check examples for.
+        """
+        if query == self.test_query:
+            return self.test_examples
+        else:
+            return []
 
 
 def test_text_only_example_conversion():
@@ -382,3 +415,76 @@ def test_example_conversion_with_text_and_function_call_response(model):
     )
 
     assert example_util.convert_examples_to_text(examples=[test_example], model=model) == expected_output
+
+    
+@pytest.mark.parametrize(
+    "model",
+    [
+        "gemini-2.5-flash",
+        "llama3_vertex_agent",
+        None
+    ],
+)
+def test_building_si_from_list(model):
+    """Tests building System Information from a list of examples."""
+    input_content = types.Content(
+        role="user",
+        parts=[types.Part(text="test_input")]
+    )
+    output_content = [types.Content(
+        role="model",
+        parts=[types.Part(text="test_output")]
+    )]
+    test_example = example.Example(
+        input=input_content,
+        output=output_content
+    )
+
+    expected_output = (
+        f"{example_util._EXAMPLES_INTRO}"
+        f"{example_util._EXAMPLE_START.format(1)}"
+        f"{example_util._USER_PREFIX}test_input\n"
+        f"{example_util._MODEL_PREFIX}test_output\n"
+        f"{example_util._EXAMPLE_END}"
+        f"{example_util._EXAMPLES_END}"
+    )
+
+    assert example_util.build_example_si(examples=[test_example], query="", model=model) == expected_output
+
+
+    
+@pytest.mark.parametrize(
+    "model",
+    [
+        "gemini-2.5-flash",
+        "llama3_vertex_agent",
+        None
+    ],
+)
+def test_building_si_from_base_example_provider(model):
+    """Tests building System Information from a BaseExampleProvider object."""
+    input_content = types.Content(
+        role="user",
+        parts=[types.Part(text="test_input")]
+    )
+    output_content = [types.Content(
+        role="model",
+        parts=[types.Part(text="test_output")]
+    )]
+    test_example = example.Example(
+        input=input_content,
+        output=output_content
+    )
+
+    expected_output = (
+        f"{example_util._EXAMPLES_INTRO}"
+        f"{example_util._EXAMPLE_START.format(1)}"
+        f"{example_util._USER_PREFIX}test_input\n"
+        f"{example_util._MODEL_PREFIX}test_output\n"
+        f"{example_util._EXAMPLE_END}"
+        f"{example_util._EXAMPLES_END}"
+    )
+
+    example_provider = MockExampleProvider(test_examples=[test_example], test_query="test_query")
+
+    assert example_util.build_example_si(examples=example_provider, query="test_query", model=model) == expected_output
